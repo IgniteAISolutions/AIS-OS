@@ -1,131 +1,83 @@
-# Writing to someone else's Outlook calendar
+# Writing to a shared Outlook calendar from Claude
 
-Why Claude can read a colleague's calendar but cannot create events on it, and
-what has to change to enable it.
+Note for Richard and the Microsoft service provider.
 
-**Live case:** Elaine has edit access to Alice's calendar and adds events to it
-manually every day. Claude, signed in as Elaine, can read Alice's calendar but
-refuses to create events on it.
+## The situation
 
-## The short answer
+Elaine has edit rights on Alice's calendar and adds events to it manually every
+day. Claude, signed in as Elaine, can read Alice's calendar but cannot create
+events on it.
 
-It is not a permissions problem on your side. Elaine's Microsoft permissions are
-already correct. It is a limitation of Claude's built-in Outlook connector.
+## The cause
 
-Two separate locks sit between Claude and "put this meeting on Alice's
-calendar":
+This is not a Microsoft permissions problem. Elaine's delegate rights are
+correct and in use.
 
-1. **Microsoft lock.** Does Elaine have edit rights on Alice's calendar?
-   **Already open.** She uses them every day.
-2. **Connector lock.** Does Claude's create-event tool have a way to say
-   "Alice's calendar", and did it ask Microsoft for permission to write to
-   shared calendars? **Shut, and you cannot open it.**
+It is a limitation in Claude's built-in Outlook connector, on two counts:
 
-## The plain-English version
+- The create-event tool only writes to the mailbox that is signed in. It has no
+  parameter for a different mailbox. The calendar search tool does have one,
+  which is why reads against Alice's calendar work and writes do not.
+- The connection holds the `Calendars.Read.Shared` scope but not
+  `Calendars.ReadWrite.Shared`. Microsoft would refuse the write even if the
+  tool had somewhere to put Alice's address.
 
-Think of a calendar as a diary sitting in someone's house.
+Neither is configurable. Granting further rights in Outlook or Entra ID changes
+nothing, because there is no route for those rights through the tool.
 
-Elaine already has a key to Alice's house. She walks in and writes in the diary
-whenever she likes. That part works.
+## Does the service provider need to build this per person?
 
-Claude has two tools. The **reading** tool has a little box on it labelled
-"whose diary?" (`calendarOwnerEmail`), so Claude can point it at Alice's house
-and read. The **writing** tool has no such box. It only ever writes in the diary
-belonging to whoever signed in. Elaine's key is irrelevant, because the pen
-physically does not reach past her own desk.
+No. The delegated model is built once at tenant level and then works for
+anyone who already has calendar rights.
 
-There is a second thing. When Claude signed in to Microsoft it asked for a
-specific list of powers, called scopes. It asked for "read calendars other
-people shared with me" (`Calendars.Read.Shared`), which is why the reading works.
-It never asked for "write to calendars other people shared with me"
-(`Calendars.ReadWrite.Shared`). Microsoft would refuse the write even if the tool
-had the box.
+**One-off work:**
 
-So the answer to "is it permissions or is Claude tied to email IDs?" is: the
-second one, effectively. The write tool is hard-wired to the mailbox that is
-signed in. Elaine's delegate rights cannot travel through a tool that has no
-parameter for them.
+| # | What | Who |
+|---|------|-----|
+| 1 | App registration in Entra ID with the `Calendars.ReadWrite.Shared` delegated permission, admin consent granted tenant-wide | M365 / Entra admin |
+| 2 | A small connector (remote MCP server) that talks to Microsoft Graph, hosted once | Service provider |
+| 3 | Enable custom connectors on the Claude workspace | Claude Team owner or primary owner |
 
-## Why you cannot fix this in settings
+**Per person after that:** they sign in to the connector once. Nothing else. No
+new registration, no new build.
 
-Anthropic's built-in Outlook connector has fixed tool definitions and fixed
-scopes. You cannot add a `calendarOwnerEmail` parameter to
-`outlook_create_event`, and you cannot widen what it asks Microsoft for. No
-amount of granting in Outlook or Entra ID changes it. That is a product change
-on Anthropic's side.
+Access is then bounded automatically by whatever calendars have already been
+shared with that person in Outlook. If Alice shares her calendar with a second
+assistant next month, it works immediately with no involvement from IT.
 
-Which means: to get shared write today, you need a path that is not the
-built-in connector.
+## The exception worth flagging
 
-## Options, ranked by effort
+There is an alternative permission model, application (app-only), where a
+service account can reach every mailbox in the tenant. That one **does** carry
+per-person admin, because you scope it with an Application Access Policy
+listing each mailbox it may touch. That is a config line rather than a build,
+but it is ongoing work and it is a much broader grant.
 
-### Option A: invite Alice as an attendee (works right now, zero setup)
+Use delegated unless something genuinely needs to run unattended with nobody
+signed in. Delegated keeps the audit trail on the individual's account, and if
+Alice ever unshares her calendar, Claude's access dies with it.
 
-Claude creates the event on Elaine's calendar and adds Alice as an attendee. It
-lands on Alice's calendar as an invite she accepts.
+## Sizing
 
-One real difference: Alice is not the organiser, Elaine is. So Alice cannot
-edit or cancel it herself, and it shows in her calendar as an accepted meeting
-rather than as her own entry. For most diary management that is fine. For
-"Elaine manages Alice's diary on her behalf", it is a downgrade from what she
-does manually today.
+About a day for someone who has done an Entra app registration before. Most of
+that is standing up and hosting the connector. The Microsoft side is routine.
 
-### Option B: Zapier or Power Automate (no code, fastest real fix)
+## Check this cheaper option first
 
-Both have a create-event action for Microsoft Outlook. Authorise the connection
-as **Elaine**, whose rights already work, then have Claude trigger it.
+A Power Automate flow using the Office 365 Outlook "Create event (V4)" action,
+with the connection authorised as Elaine. No app registration, no hosting, and
+built once per pattern rather than per person. Zapier's Microsoft Outlook
+"Create Event" action is the equivalent if that is already in use.
 
-- Zapier: Microsoft Outlook > Create Event. You have Zapier connected already.
-- Power Automate: Office 365 Outlook > Create event (V4).
+Before committing to it, open the action's calendar picker and confirm Alice's
+calendar actually appears. Shared calendars sit at a different address in the
+Graph API than a user's own, and some connectors only list your own. If she is
+in the list, this is an afternoon rather than a day. If she is not, fall back to
+the connector above.
 
-**Verify this before committing to it:** open the action's Calendar dropdown and
-check that Alice's calendar actually appears in the list. Shared calendars live
-at a different address in Microsoft's API than your own, and some connectors only
-list your own. If Alice's calendar is not in the picker, this route will not work
-and you need Option C.
+## Interim
 
-Rough effort: under an hour, assuming the calendar shows up.
-
-### Option C: a custom Graph connector (the proper fix)
-
-A small remote MCP server that talks to Microsoft Graph directly, registered as
-an app in Entra ID, added to Claude as a custom connector. Its create-event tool
-takes a mailbox parameter, so it can write anywhere Elaine has delegate rights.
-
-Two permission models:
-
-- **Delegated** (`Calendars.ReadWrite.Shared`): acts as Elaine, limited to
-  calendars actually shared with her. Safer, and the audit trail stays on her
-  account. This is the right one here.
-- **Application** (`Calendars.ReadWrite` app-only): acts as a service account and
-  can reach every mailbox in the tenant. Only if you need it running unattended,
-  and only with an Application Access Policy naming exactly which mailboxes it
-  may touch.
-
-Who does what:
-
-| # | Who | What |
-|---|-----|------|
-| 1 | Alice | Already done. Elaine has "Can edit" on her calendar. |
-| 2 | M365 / Entra admin | Register the app, add `Calendars.ReadWrite.Shared` delegated permission, grant admin consent |
-| 3 | Claude Team owner or primary owner | Enable custom connectors for the workspace (Settings > Connectors) |
-| 4 | Whoever builds it | Stand up the MCP server, add it in Claude |
-| 5 | Elaine | Reconnect the connector so the new scope lands on her token |
-
-Rough effort: a day for someone who has done an Entra app registration before.
-
-## Security note
-
-Write access to someone else's calendar is a real privilege. The delegated model
-keeps Alice in control, since revoking Elaine's calendar sharing instantly kills
-Claude's access too, and every event carries Elaine's name. App-only permission
-without an Access Policy does not do either. Do not reach for the bigger hammer
-because it is quicker to set up.
-
-## Recommendation
-
-1. Use Option A today so Elaine is not blocked.
-2. Spend twenty minutes checking whether Alice's calendar appears in the Zapier
-   Outlook picker. If it does, Option B is your answer this week.
-3. Only build Option C if this becomes a standing workflow across more than one
-   executive.
+Until either is in place, Claude can create the event on Elaine's calendar and
+add Alice as an attendee. It reaches Alice's calendar as an invite. The
+difference is that Elaine is the organiser, so Alice cannot edit or cancel it
+herself.
