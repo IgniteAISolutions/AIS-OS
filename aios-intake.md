@@ -19,7 +19,24 @@ Identity, offer, ICP. One paragraph each is fine.
 
 **Entities:** two. IgniteAI Solutions Ltd (UK) and Ignite AI Solutions FZCO (UAE, Abu Dhabi). Chris operates from Abu Dhabi with UK delivery remote.
 
-**Known gap (own words):** "What I don't have is a systematised approach to this." The delivery is real; the repeatable method behind it isn't built yet.
+**Positioning:** governance-first. "People First. Technology Second." London and Dubai. Claude Partner Network Member. Founder-delivered: 23 years UK Defence (Royal Signals, ex-Special-Forces communicator), Certified Chief AI Officer, featured in Forbes.
+
+**The offer ladder (published on igniteaisolutions.ai, AED with USD equivalent, founding-client tier on top):**
+
+| Rung | Offer | Price |
+|---|---|---|
+| 1 | Free AI Readiness Scorecard | free, feeds the paid SPARK |
+| 2 | SPARK + Discovery, Responsible AI Readiness assessment mapped to PDPL, UAE AI Charter, ISO 42001, NESA, Dubai AI Seal | AED 55,000 (founding 40,000) |
+| 3 | **Ignite AIOS**, five-seat AI operating system, 30-day in-business production build. Claude Built For You (CBFY) is the build inside | AED 130,000 (founding 100,000) |
+| 4 | Training: Team, Corporate, Leadership Strategy days, hands-on Claude on real work | AED 12,000 to 23,000 per day |
+| 5 | Monthly retainer, optimisation, new builds, ongoing governance | AED 25,000/mo (founding 20,000) |
+
+**Ignite AIOS five pillars:** business context, individual voice, role skills, workflows and schedules, living knowledge base.
+**CBFY four phases:** Govern, Build, Embed, Evolve.
+
+**Target sectors:** accounting/tax/compliance, real estate/brokerage, logistics/trade, family-business back-office.
+
+**Known gap (own words):** "What I don't have is a systematised approach to this." Read against the ladder above, the gap is not the offer. The offer is productised and priced. The gap is repeatable *delivery*: turning a sold engagement into its artefacts without the founder writing each one from scratch.
 ```
 
 ---
