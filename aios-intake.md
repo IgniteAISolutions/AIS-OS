@@ -11,7 +11,13 @@ This is the source-of-truth file for your AIOS. Fill it in by typing, voice-past
 Identity, offer, ICP. One paragraph each is fine.
 
 ```
-[Your answer here]
+**Identity:** Chris Duffy, Ignite AI Solutions (igniteaisolutions.co.uk). AI consultant / implementation partner.
+
+**Offer:** Support for businesses wanting to take things to the next level — AI governance, Claude implementation, training, and AI strategy & transformation.
+
+**ICP:** SMEs.
+
+**Known gap (own words):** "What I don't have is a systematised approach to this." The delivery is real; the repeatable method behind it isn't built yet.
 ```
 
 ---
