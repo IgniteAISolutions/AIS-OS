@@ -17,6 +17,8 @@ Identity, offer, ICP. One paragraph each is fine.
 
 **ICP:** SMEs.
 
+**Entities:** two. IgniteAI Solutions Ltd (UK) and Ignite AI Solutions FZCO (UAE, Abu Dhabi). Chris operates from Abu Dhabi with UK delivery remote.
+
 **Known gap (own words):** "What I don't have is a systematised approach to this." The delivery is real; the repeatable method behind it isn't built yet.
 ```
 
@@ -53,9 +55,11 @@ Quarterly priorities. Not yearly aspirations. Things that, if not done by July, 
 2. _[pending]_
 3. _[pending]_
 
+Target spans both entities: IgniteAI Solutions Ltd (UK) and Ignite AI Solutions FZCO (UAE).
+
 **Open against this answer:**
-- The second business is not yet named. Q1 captured Ignite AI Solutions only. Needed before `context/about-business.md` can be written properly.
-- £20k p/m is an outcome, not an action. The 2 supporting priorities should be the things that produce it.
+- ~~The second business is not yet named.~~ Answered: UK Ltd and UAE FZCO. Recorded in Q1.
+- £20k p/m is an outcome, not an action. Priorities 2 and 3 should be the mechanisms that produce it. Still outstanding.
 ```
 
 ---
