@@ -49,9 +49,13 @@ If a worked example is ever wanted in-repo, redact first.
 Quarterly priorities. Not yearly aspirations. Things that, if not done by July, would make you say "I wasted Q2."
 
 ```
-1. [Priority 1]
-2. [Priority 2]
-3. [Priority 3]
+1. **£20,000 per month recurring revenue across both businesses by December 2026.** The headline number. Roughly a 3-month runway from mid-September 2026.
+2. _[pending]_
+3. _[pending]_
+
+**Open against this answer:**
+- The second business is not yet named. Q1 captured Ignite AI Solutions only. Needed before `context/about-business.md` can be written properly.
+- £20k p/m is an outcome, not an action. The 2 supporting priorities should be the things that produce it.
 ```
 
 ---
